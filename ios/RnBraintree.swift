@@ -60,15 +60,17 @@ class RnBraintree: NSObject {
                 if (error != nil) {
                     print("ERROR")
                     reject("400", "Error  Presenting BTDropInController", nil)
+                    return
                 } else if (result?.isCancelled == true) {
                     print("CANCELED")
                     reject("400", "Canceled BTDropInController", nil)
+                    return
                 }
                 guard let paymentResult = result else {
                     reject("400", "Unable to get payment result", nil)
                     return
                 }
-                resolve(paymentResult.paymentMethod)
+            resolve(paymentResult.paymentMethod?.nonce)
                 controller.dismiss(animated: true, completion: nil)
             }
         DispatchQueue.main.async {
