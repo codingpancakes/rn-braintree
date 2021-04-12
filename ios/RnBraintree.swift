@@ -48,6 +48,35 @@ class RnBraintree: NSObject {
         }
     }
     
+    @objc(getCardNonceFromDropIn:withResolver:withRejecter:)
+    func getCardNonceFromDropIn(cardOptions: NSDictionary, resolve: @escaping RCTPromiseResolveBlock,reject: @escaping RCTPromiseRejectBlock) -> Void {
+        guard let token = clientToken else {
+            reject("400", "Client Token is Invalid. Please check and retry!", nil)
+            return
+        }
+        let request =  BTDropInRequest()
+        let dropIn = BTDropInController(authorization: token, request: request)
+            { (controller, result, error) in
+                if (error != nil) {
+                    print("ERROR")
+                    reject("400", "Error  Presenting BTDropInController", nil)
+                } else if (result?.isCancelled == true) {
+                    print("CANCELED")
+                    reject("400", "Canceled BTDropInController", nil)
+                }
+                guard let paymentResult = result else {
+                    reject("400", "Unable to get payment result", nil)
+                    return
+                }
+                resolve(paymentResult.paymentMethod)
+                controller.dismiss(animated: true, completion: nil)
+            }
+        DispatchQueue.main.async {
+            let presentedViewController = RCTPresentedViewController()
+            presentedViewController?.present(dropIn!, animated: true, completion: nil)
+        }
+    }
+    
     @objc(paymentRequest:withResolver:withRejecter:)
     func paymentRequest(paymentOptions: NSDictionary, resolve: @escaping RCTPromiseResolveBlock,reject: @escaping RCTPromiseRejectBlock) -> Void {
         
