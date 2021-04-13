@@ -59,17 +59,23 @@ class RnBraintree: NSObject {
             { (controller, result, error) in
                 if (error != nil) {
                     print("ERROR")
-                    controller.dismiss(animated: true, completion: nil)
+                    DispatchQueue.main.async {
+                        controller.dismiss(animated: true, completion: nil)
+                    }
                     reject("400", "Error  Presenting BTDropInController", nil)
                     return
                 } else if (result?.isCancelled == true) {
                     print("CANCELED")
-                    controller.dismiss(animated: true, completion: nil)
+                    DispatchQueue.main.async {
+                        controller.dismiss(animated: true, completion: nil)
+                    }
                     reject("400", "Canceled BTDropInController", nil)
                     return
                 }
                 guard let paymentResult = result else {
-                    controller.dismiss(animated: true, completion: nil)
+                    DispatchQueue.main.async {
+                        controller.dismiss(animated: true, completion: nil)
+                    }
                     reject("400", "Unable to get payment result", nil)
                     return
                 }
